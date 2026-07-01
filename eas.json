@@ -3,40 +3,6 @@
     "version": ">= 3.8.1"
   },
   "build": {
-    "production": {
-      "channel": "production",
-      "distribution": "store",
-      "pnpm": "9.12.3",
-      "ios": {
-        "image": "latest"
-      },
-      "android": {
-        "buildType": "app-bundle",
-        "image": "latest"
-      },
-      "env": {
-        "EXPO_NO_DOTENV": "1",
-        "APP_ENV": "production",
-        "FLIPPER_DISABLE": "1"
-      }
-    },
-    "staging": {
-      "channel": "staging",
-      "distribution": "internal",
-      "pnpm": "9.12.3",
-      "ios": {
-        "image": "latest"
-      },
-      "android": {
-        "buildType": "apk",
-        "image": "latest"
-      },
-      "env": {
-        "APP_ENV": "staging",
-        "EXPO_NO_DOTENV": "1",
-        "FLIPPER_DISABLE": "1"
-      }
-    },
     "development": {
       "developmentClient": true,
       "distribution": "internal",
@@ -52,17 +18,19 @@
         "EXPO_NO_DOTENV": "1"
       }
     },
-    "simulator": {
+    "production": {
+      "channel": "production",
+      "distribution": "store",
       "pnpm": "9.12.3",
       "ios": {
-        "simulator": true,
         "image": "latest"
       },
       "android": {
+        "buildType": "app-bundle",
         "image": "latest"
       },
       "env": {
-        "APP_ENV": "development",
+        "APP_ENV": "production",
         "EXPO_NO_DOTENV": "1"
       }
     }

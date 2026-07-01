@@ -1,51 +1,8 @@
 import * as React from 'react';
-import type {
-  Control,
-  FieldValues,
-  Path,
-  RegisterOptions,
-} from 'react-hook-form';
-import { useController } from 'react-hook-form';
 import type { TextInputProps } from 'react-native';
-import { I18nManager, StyleSheet, View } from 'react-native';
-import { TextInput as NTextInput } from 'react-native';
-import { tv } from 'tailwind-variants';
+import { I18nManager, StyleSheet, TextInput as NTextInput, View } from 'react-native';
 
-import colors from './colors';
 import { Text } from './text';
-
-const inputTv = tv({
-  slots: {
-    container: 'mb-2',
-    label: 'text-grey-100 mb-1 text-lg dark:text-neutral-100',
-    input:
-      'mt-0 rounded-xl border-[0.5px] border-neutral-300 bg-neutral-100 px-4 py-3 font-inter text-base  font-medium leading-5 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white',
-  },
-
-  variants: {
-    focused: {
-      true: {
-        input: 'border-neutral-400 dark:border-neutral-300',
-      },
-    },
-    error: {
-      true: {
-        input: 'border-danger-600',
-        label: 'text-danger-600 dark:text-danger-600',
-      },
-    },
-    disabled: {
-      true: {
-        input: 'bg-neutral-200',
-      },
-    },
-  },
-  defaultVariants: {
-    focused: false,
-    error: false,
-    disabled: false,
-  },
-});
 
 export interface NInputProps extends TextInputProps {
   label?: string;
@@ -53,68 +10,50 @@ export interface NInputProps extends TextInputProps {
   error?: string;
 }
 
-type TRule<T extends FieldValues> =
-  | Omit<
-      RegisterOptions<T>,
-      'disabled' | 'valueAsNumber' | 'valueAsDate' | 'setValueAs'
-    >
-  | undefined;
-
-export type RuleType<T extends FieldValues> = { [name in keyof T]: TRule<T> };
-export type InputControllerType<T extends FieldValues> = {
-  name: Path<T>;
-  control: Control<T>;
-  rules?: RuleType<T>;
-};
-
-interface ControlledInputProps<T extends FieldValues>
-  extends NInputProps,
-    InputControllerType<T> {}
-
 export const Input = React.forwardRef<NTextInput, NInputProps>((props, ref) => {
-  const { label, error, testID, ...inputProps } = props;
-  const [isFocussed, setIsFocussed] = React.useState(false);
-  const onBlur = React.useCallback(() => setIsFocussed(false), []);
-  const onFocus = React.useCallback(() => setIsFocussed(true), []);
+  const { label, error, disabled, testID, style, ...inputProps } = props;
+  const [isFocused, setIsFocused] = React.useState(false);
 
-  const styles = React.useMemo(
-    () =>
-      inputTv({
-        error: Boolean(error),
-        focused: isFocussed,
-        disabled: Boolean(props.disabled),
-      }),
-    [error, isFocussed, props.disabled]
-  );
+  const onBlur = React.useCallback(() => setIsFocused(false), []);
+  const onFocus = React.useCallback(() => setIsFocused(true), []);
+
+  const borderColor = error
+    ? 'rgba(255,137,51,0.6)'
+    : isFocused
+      ? 'rgba(255,137,51,0.55)'
+      : 'rgba(255,255,255,0.08)';
 
   return (
-    <View className={styles.container()}>
+    <View style={styles.container}>
       {label && (
         <Text
           testID={testID ? `${testID}-label` : undefined}
-          className={styles.label()}
+          style={[styles.label, error ? styles.labelError : undefined]}
         >
           {label}
         </Text>
       )}
       <NTextInput
-        testID={testID}
         ref={ref}
-        placeholderTextColor={colors.neutral[400]}
-        className={styles.input()}
+        testID={testID}
+        placeholderTextColor="#4D5A6B"
         onBlur={onBlur}
         onFocus={onFocus}
+        editable={!disabled}
         {...inputProps}
         style={StyleSheet.flatten([
+          styles.input,
+          { borderColor },
+          disabled && styles.inputDisabled,
           { writingDirection: I18nManager.isRTL ? 'rtl' : 'ltr' },
           { textAlign: I18nManager.isRTL ? 'right' : 'left' },
-          inputProps.style,
+          style,
         ])}
       />
       {error && (
         <Text
           testID={testID ? `${testID}-error` : undefined}
-          className="text-sm text-danger-400 dark:text-danger-600"
+          style={styles.errorText}
         >
           {error}
         </Text>
@@ -123,21 +62,38 @@ export const Input = React.forwardRef<NTextInput, NInputProps>((props, ref) => {
   );
 });
 
-// only used with react-hook-form
-export function ControlledInput<T extends FieldValues>(
-  props: ControlledInputProps<T>
-) {
-  const { name, control, rules, ...inputProps } = props;
-
-  const { field, fieldState } = useController({ control, name, rules });
-  return (
-    <Input
-      ref={field.ref}
-      autoCapitalize="none"
-      onChangeText={field.onChange}
-      value={(field.value as string) || ''}
-      {...inputProps}
-      error={fieldState.error?.message}
-    />
-  );
-}
+const styles = StyleSheet.create({
+  container: {
+    marginBottom: 16,
+  },
+  label: {
+    fontSize: 11,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 1.8,
+    color: '#8F98AB',
+    marginBottom: 8,
+  },
+  labelError: {
+    color: '#FF8933',
+  },
+  input: {
+    backgroundColor: '#0F141C',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontFamily: 'Inter',
+  },
+  inputDisabled: {
+    opacity: 0.45,
+  },
+  errorText: {
+    fontSize: 12,
+    color: '#FF8933',
+    marginTop: 6,
+  },
+});

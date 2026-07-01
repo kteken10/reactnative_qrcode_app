@@ -1,3 +1,58 @@
+# QR Code Generator
+
+<p align="center">
+  <img alt="logo" src="./assets/icon.png" width="124px" style="border-radius:10px"/><br/>
+  A focused React Native application for generating, previewing, sharing, and saving QR codes.
+</p>
+
+## Overview
+
+This app is now maintained as a lean Expo managed project. It keeps the QR generation flow, image capture, sharing, localization, and the UI primitives that are still actually used.
+
+## Features
+
+- Generate QR codes from text or URLs.
+- Generate QR codes from an imported image.
+- Capture a QR preview and share it.
+- Save the generated code through the system share sheet.
+- Switch between supported languages.
+
+## Technology Stack
+
+- Expo
+- React Native
+- Expo Router
+- NativeWind
+- react-native-qrcode-svg
+- expo-image-picker
+- expo-sharing
+- react-native-view-shot
+
+## Requirements
+
+- Node.js LTS
+- pnpm
+- Git
+- EAS CLI
+- VS Code or Cursor
+
+## Installation
+
+```bash
+git clone https://github.com/kteken10/reactnative_qrcode_app
+cd reactnative_qrcode_app
+pnpm install
+```
+
+## Development Workflow
+
+Use `pnpm start` to launch Metro in dev-client mode.
+
+Use `pnpm android` for a local Android development build when the Android toolchain is available.
+
+From Windows, use `pnpm ios` to trigger an iPhone development build through Expo EAS, then install the resulting build on your device.
+
+The repository should stay managed by Expo. Generated native folders are ignored and should not be versioned.
 <h1 align="center">
   <img alt="logo" src="./assets/icon.png" width="124px" style="border-radius:10px"/><br/>
 ✨ QR Code Generator ✨</h1>

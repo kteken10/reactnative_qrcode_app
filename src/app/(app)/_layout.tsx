@@ -1,75 +1,101 @@
-/* eslint-disable react/no-unstable-nested-components */
-import { Link, Redirect, SplashScreen, Tabs } from 'expo-router';
-import React, { useCallback, useEffect } from 'react';
+import { BlurView } from 'expo-blur';
+import { Tabs } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { StyleSheet } from 'react-native';
+import { Home2, Edit2, Scan, ChartSquare, Setting2 } from 'iconsax-react-native';
 
-import { Pressable, Text } from '@/components/ui';
-import {
-  Feed as FeedIcon,
-  Settings as SettingsIcon,
-  Style as StyleIcon,
-} from '@/components/ui/icons';
-import { useAuth, useIsFirstTime } from '@/lib';
-
-export default function TabLayout() {
-  const status = useAuth.use.status();
-  const [isFirstTime] = useIsFirstTime();
-  const hideSplash = useCallback(async () => {
-    await SplashScreen.hideAsync();
-  }, []);
-  useEffect(() => {
-    if (status !== 'idle') {
-      setTimeout(() => {
-        hideSplash();
-      }, 1000);
-    }
-  }, [hideSplash, status]);
-
-  if (isFirstTime) {
-    return <Redirect href="/start" />;
-  }
-  if (status === 'signOut') {
-    return <Redirect href="/login" />;
-  }
+function TabBarBackground() {
   return (
-    <Tabs>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Feed',
-          tabBarIcon: ({ color }) => <FeedIcon color={color} />,
-          headerRight: () => <CreateNewPostLink />,
-          tabBarButtonTestID: 'feed-tab',
-        }}
-      />
-
-      <Tabs.Screen
-        name="style"
-        options={{
-          title: 'Style',
-          headerShown: false,
-          tabBarIcon: ({ color }) => <StyleIcon color={color} />,
-          tabBarButtonTestID: 'style-tab',
-        }}
-      />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: 'Settings',
-          headerShown: false,
-          tabBarIcon: ({ color }) => <SettingsIcon color={color} />,
-          tabBarButtonTestID: 'settings-tab',
-        }}
-      />
-    </Tabs>
+    <BlurView
+      intensity={80}
+      tint="dark"
+      style={StyleSheet.absoluteFill}
+    />
   );
 }
 
-const CreateNewPostLink = () => {
+export default function AppTabsLayout() {
   return (
-    <Link href="/feed/add-post" asChild>
-      <Pressable>
-        <Text className="px-3 text-primary-300">Create</Text>
-      </Pressable>
-    </Link>
+    <>
+      <StatusBar style="light" />
+      <Tabs
+        screenOptions={{
+          headerShown: false,
+          tabBarActiveTintColor: '#FF8933',
+          tabBarInactiveTintColor: '#7A8799',
+          tabBarBackground: () => <TabBarBackground />,
+          tabBarStyle: {
+            backgroundColor: 'transparent',
+            borderTopColor: 'rgba(255,255,255,0.06)',
+            borderTopWidth: 0.5,
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            elevation: 0,
+          },
+          tabBarLabelStyle: {
+            fontSize: 10,
+            fontWeight: '600',
+            letterSpacing: 0.2,
+            marginBottom: 4,
+          },
+          tabBarItemStyle: {
+            paddingTop: 6,
+          },
+        }}
+      >
+        <Tabs.Screen
+          name="dashboard"
+          options={{
+            title: 'Home',
+            tabBarIcon: ({ color, focused }) => (
+              <Home2 size={22} color={color} variant={focused ? 'Bold' : 'Linear'} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="generator"
+          options={{
+            title: 'Studio',
+            tabBarIcon: ({ color, focused }) => (
+              <Edit2 size={22} color={color} variant={focused ? 'Bold' : 'Linear'} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="scanner"
+          options={{
+            title: 'Scanner',
+            tabBarIcon: ({ color, focused }) => (
+              <Scan size={22} color={color} variant={focused ? 'Bold' : 'Linear'} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="library"
+          options={{ href: null }}
+        />
+        <Tabs.Screen
+          name="analytics"
+          options={{
+            title: 'Aperçu',
+            tabBarIcon: ({ color, focused }) => (
+              <ChartSquare size={22} color={color} variant={focused ? 'Bold' : 'Linear'} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="settings"
+          options={{
+            title: 'Réglages',
+            tabBarIcon: ({ color, focused }) => (
+              <Setting2 size={22} color={color} variant={focused ? 'Bold' : 'Linear'} />
+            ),
+          }}
+        />
+        <Tabs.Screen name="index" options={{ href: null }} />
+      </Tabs>
+    </>
   );
-};
+}
