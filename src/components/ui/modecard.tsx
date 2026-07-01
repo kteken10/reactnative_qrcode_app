@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pressable, View } from 'react-native';
-import { Text as TextComponent } from '@/components/ui';
+import { Text as TextComponent } from './text';
 
 interface ModeCardProps {
   icon: React.ElementType;
@@ -21,22 +21,22 @@ export const ModeCard: React.FC<ModeCardProps> = ({
 }) => (
   <Pressable
     onPress={() => onPress(mode)}
-    className={`p-4 rounded-xl border-2 mb-4 flex-1 mx-2 ${
-      currentMode === mode 
-        ? 'border-blue-500 bg-blue-50' 
-        : 'border-gray-100 bg-white'
+    className={`p-4 rounded-2xl border mb-4 flex-1 mx-2 ${
+      currentMode === mode
+        ? 'border-[#FF8933] bg-[#FF8933]/10'
+        : 'border-white/[0.08] bg-white/5'
     }`}
   >
     <View className="items-center">
-      <Icon 
-        size={32} 
-        color={currentMode === mode ? '#3b82f6' : '#6b7280'} 
-        variant="Bold" 
+      <Icon
+        size={32}
+        color={currentMode === mode ? '#FF8933' : '#8F98AB'}
+        variant="Bold"
       />
-      <TextComponent className="mt-2 font-bold text-center">
+      <TextComponent className="mt-2 font-bold text-center text-white">
         {title}
       </TextComponent>
-      <TextComponent className="mt-1 text-xs text-center text-gray-500">
+      <TextComponent className="mt-1 text-xs text-center text-[#8F98AB]">
         {description}
       </TextComponent>
     </View>

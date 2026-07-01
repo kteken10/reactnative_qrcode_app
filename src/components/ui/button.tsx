@@ -1,89 +1,88 @@
+import * as Haptics from 'expo-haptics';
 import React from 'react';
 import type { PressableProps } from 'react-native';
-import { ActivityIndicator, Pressable} from 'react-native';
+import { ActivityIndicator, Platform, Pressable, View } from 'react-native';
 import type { VariantProps } from 'tailwind-variants';
 import { tv } from 'tailwind-variants';
-import { Text, View, } from '@/components/ui';
+import { Text } from '@/components/ui/text';
+
 const button = tv({
   slots: {
-    container: 'my-2 flex flex-row items-center justify-center rounded-md px-4',
+    container: 'flex flex-row items-center justify-center rounded-full px-6',
     label: 'font-inter text-base font-semibold',
-    indicator: 'h-6 text-white',
-    icon: 'mr-2', // Nouveau slot pour le style des icônes
+    indicator: 'h-6',
+    icon: 'mr-2',
   },
 
   variants: {
     variant: {
       default: {
-        container: 'bg-black dark:bg-white',
-        label: 'text-white dark:text-black',
-        indicator: 'text-white dark:text-black',
-        icon: 'text-white dark:text-black',
+        container: 'bg-[#FF8933]',
+        label: 'text-white',
+        indicator: 'text-white',
+        icon: 'text-white',
       },
-      secondary: {
-        container: 'bg-primary-100 border border-primary-600',
-        label: 'text-primary-600',
-        indicator: 'text-primary-600',
-        icon: 'text-primary-600',
+      glass: {
+        container: 'bg-white/5 border border-white/10',
+        label: 'text-white',
+        indicator: 'text-white',
+        icon: 'text-white',
       },
       outline: {
-        container: 'border border-neutral-400',
-        label: 'text-black dark:text-neutral-100',
-        indicator: 'text-black dark:text-neutral-100',
-        icon: 'text-black dark:text-neutral-100',
+        container: 'border border-white/15 bg-transparent',
+        label: 'text-white',
+        indicator: 'text-white',
+        icon: 'text-white',
       },
       destructive: {
-        container: 'bg-red-600',
+        container: 'bg-[#FF8933]',
         label: 'text-white',
         indicator: 'text-white',
         icon: 'text-white',
       },
       ghost: {
         container: 'bg-transparent',
-        label: 'text-black underline dark:text-white',
-        indicator: 'text-black dark:text-white',
-        icon: 'text-black dark:text-white',
+        label: 'text-[#8F98AB]',
+        indicator: 'text-[#8F98AB]',
+        icon: 'text-[#8F98AB]',
       },
       link: {
         container: 'bg-transparent',
-        label: 'text-black',
-        indicator: 'text-black',
-        icon: 'text-black',
+        label: 'text-[#FF8933] underline',
+        indicator: 'text-[#FF8933]',
+        icon: 'text-[#FF8933]',
       },
     },
     size: {
       default: {
-        container: 'h-10 px-4',
+        container: 'h-[52px] px-6',
         label: 'text-base',
         icon: 'size-5',
       },
       lg: {
-        container: 'h-12 px-8',
-        label: 'text-xl',
+        container: 'h-[56px] px-8',
+        label: 'text-lg',
         icon: 'size-6',
       },
       md: {
-        container: 'h-9 px-4',
+        container: 'h-[44px] px-5',
         label: 'text-sm',
         icon: 'size-5',
       },
       sm: {
-        container: 'h-8 px-3',
+        container: 'h-[36px] px-4',
         label: 'text-sm',
-        indicator: 'h-2',
+        indicator: 'h-4',
         icon: 'size-4',
       },
-      icon: { 
-        container: 'size-9',
+      icon: {
+        container: 'size-[52px] px-0',
         icon: 'size-5',
       },
     },
     disabled: {
       true: {
-        container: 'bg-neutral-300 dark:bg-neutral-300',
-        label: 'text-neutral-600 dark:text-neutral-600',
-        indicator: 'text-neutral-400 dark:text-neutral-400',
-        icon: 'text-neutral-400 dark:text-neutral-400',
+        container: 'opacity-40',
       },
     },
     fullWidth: {
@@ -136,14 +135,21 @@ export const Button = React.forwardRef<View, Props>(
       [variant, disabled, size]
     );
 
+    const indicatorColor =
+      variant === 'default' ? '#FFFFFF'
+      : variant === 'destructive' ? '#FFFFFF'
+      : variant === 'ghost' ? '#8F98AB'
+      : variant === 'link' ? '#FF8933'
+      : '#FFFFFF';
+
     const renderContent = () => {
       if (children) return children;
-      
+
       if (loading) {
         return (
           <ActivityIndicator
             size="small"
-            className={styles.indicator()}
+            color={indicatorColor}
             testID={testID ? `${testID}-activity-indicator` : undefined}
           />
         );
@@ -169,13 +175,29 @@ export const Button = React.forwardRef<View, Props>(
       );
     };
 
+    const handlePress: PressableProps['onPress'] = (e) => {
+      if (Platform.OS === 'ios' && !disabled && !loading) {
+        Haptics.impactAsync(
+          variant === 'default' || variant === 'destructive'
+            ? Haptics.ImpactFeedbackStyle.Medium
+            : Haptics.ImpactFeedbackStyle.Light
+        );
+      }
+      props.onPress?.(e);
+    };
+
     return (
       <Pressable
+        ref={ref}
         disabled={disabled || loading}
         className={styles.container({ className })}
-        {...props}
-        ref={ref}
         testID={testID}
+        {...props}
+        onPress={handlePress}
+        style={({ pressed }) => [
+          typeof props.style === 'function' ? props.style({ pressed }) : props.style,
+          pressed && { opacity: 0.82 },
+        ]}
       >
         {renderContent()}
       </Pressable>

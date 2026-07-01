@@ -1,14 +1,31 @@
-import { useRouter } from 'expo-router';
-import React, { useState, useRef } from 'react';
+import * as ImagePicker from 'expo-image-picker';
+import * as Sharing from 'expo-sharing';
+import {
+  Camera,
+  CloseSquare,
+  Gallery,
+  Link,
+  Magicpen,
+  Save2,
+  Share,
+  Text as TextIcon,
+} from 'iconsax-react-native';
+import React, { useRef, useState } from 'react';
 import { Animated, Easing, Image } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
-import * as Sharing from 'expo-sharing';
-import * as ImagePicker from 'expo-image-picker';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { captureRef } from 'react-native-view-shot';
-import { Save2, CloseSquare, Magicpen, Share, Gallery, Text as TextIcon, Link, Camera } from 'iconsax-react-native';
 
-import { Button, ModeCard, FocusAwareStatusBar, Input, SafeAreaView, Text as TextComponent, View, Modal, useModal } from '@/components/ui';
-
+import {
+  Button,
+  FocusAwareStatusBar,
+  Input,
+  Modal,
+  ModeCard,
+  Text as TextComponent,
+  useModal,
+  View,
+} from '@/components/ui';
 
 type GenerationMode = 'text' | 'url' | 'image' | 'contact';
 
@@ -17,12 +34,11 @@ export default function QRGenerator() {
   const [qrValue, setQrValue] = useState('');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [generationMode, setGenerationMode] = useState<GenerationMode>('text');
-  const router = useRouter();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.5)).current;
   const rotateAnim = useRef(new Animated.Value(0)).current;
   const qrRef = useRef(null);
-  
+
   const { ref: modalRef, present, dismiss } = useModal();
 
   const pickImage = async () => {
@@ -60,12 +76,12 @@ export default function QRGenerator() {
   const generateQR = async () => {
     if (generationMode === 'image') {
       if (!selectedImage) {
-        alert('📸 Oups! Veuillez sélectionner une image');
+        alert('Veuillez sélectionner une image');
         return;
       }
       setQrValue(selectedImage);
     } else if (!inputText.trim()) {
-      alert('✏️ Oups! Veuillez entrer un texte ou URL');
+      alert('Veuillez entrer un texte ou une URL');
       return;
     } else {
       setQrValue(inputText);
@@ -85,7 +101,7 @@ export default function QRGenerator() {
     fadeAnim.setValue(0);
     scaleAnim.setValue(0.5);
     rotateAnim.setValue(0);
-    
+
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -146,161 +162,220 @@ export default function QRGenerator() {
   });
 
   return (
-    <View className="flex-1 p-4 bg-gray-100">
+    <SafeAreaView className="flex-1 bg-[#090D12]">
       <FocusAwareStatusBar />
-      
-      <TextComponent className="mb-6 text-2xl font-bold text-center text-gray-800">
-        ✨ Générateur QR Code 
-      </TextComponent>
-      
-      <TextComponent className="mb-3 text-lg font-semibold">🎯 Type de contenu</TextComponent>
-      <View className="flex-row mb-4">
-        <ModeCard 
-          icon={TextIcon} 
-          title="Texte " 
-          mode="text"
-          description="Générer à partir d'un texte" 
-          currentMode={generationMode}
-          onPress={(mode) => setGenerationMode(mode as GenerationMode)}
-        />
-        <ModeCard 
-          icon={Link} 
-          title="URL 🔗" 
-          mode="url"
-          description="Générer à partir d'un lien" 
-          currentMode={generationMode}
-         onPress={(mode) => setGenerationMode(mode as GenerationMode)}
-        />
-      </View>
-      <View className="flex-row mb-6">
-        <ModeCard 
-          icon={Gallery} 
-          title="Image 🖼️" 
-          mode="image"
-          description="Générer à partir d'une image" 
-          currentMode={generationMode}
-           onPress={(mode) => setGenerationMode(mode as GenerationMode)}
-        />
-        <ModeCard 
-          icon={Camera} 
-          title="Contact 👤" 
-          mode="contact"
-          description="Générer une carte de contact" 
-          currentMode={generationMode}
-          onPress={(mode) => setGenerationMode(mode as GenerationMode)}
-        />
+
+      <View className="flex-1 p-4">
+        <TextComponent className="mb-6 text-center text-2xl font-bold text-white">
+          Générateur QR Code
+        </TextComponent>
+
+        <TextComponent className="mb-3 text-xs font-semibold uppercase tracking-widest text-[#8F98AB]">
+          Type de contenu
+        </TextComponent>
+        <View className="-mx-2 mb-4 flex-row">
+          <ModeCard
+            icon={TextIcon}
+            title="Texte"
+            mode="text"
+            description="Générer à partir d'un texte"
+            currentMode={generationMode}
+            onPress={(mode) => setGenerationMode(mode as GenerationMode)}
+          />
+          <ModeCard
+            icon={Link}
+            title="URL"
+            mode="url"
+            description="Générer à partir d'un lien"
+            currentMode={generationMode}
+            onPress={(mode) => setGenerationMode(mode as GenerationMode)}
+          />
+        </View>
+        <View className="-mx-2 mb-6 flex-row">
+          <ModeCard
+            icon={Gallery}
+            title="Image"
+            mode="image"
+            description="Générer à partir d'une image"
+            currentMode={generationMode}
+            onPress={(mode) => setGenerationMode(mode as GenerationMode)}
+          />
+          <ModeCard
+            icon={Camera}
+            title="Contact"
+            mode="contact"
+            description="Générer une carte de contact"
+            currentMode={generationMode}
+            onPress={(mode) => setGenerationMode(mode as GenerationMode)}
+          />
+        </View>
+
+        {generationMode === 'image' ? (
+          <View className="mb-6">
+            {selectedImage ? (
+              <View className="mb-4 items-center">
+                <Image
+                  source={{ uri: selectedImage }}
+                  className="mb-3 size-32 rounded-2xl"
+                />
+                <Button
+                  label="Changer d'image"
+                  onPress={pickImage}
+                  variant="outline"
+                  className="mb-2 border border-white/10 bg-white/5"
+                  textClassName="text-white"
+                  size="sm"
+                />
+              </View>
+            ) : (
+              <View className="flex-row justify-between gap-3">
+                <Button
+                  label="Importer"
+                  onPress={pickImage}
+                  className="flex-1 bg-[#FF8933]"
+                  textClassName="text-white"
+                  size="sm"
+                  icon={
+                    <Gallery
+                      variant="Bold"
+                      size="16"
+                      color="white"
+                      className="mr-1"
+                    />
+                  }
+                />
+                <Button
+                  label="Photo"
+                  onPress={takePhoto}
+                  className="flex-1 bg-[#FF8933]"
+                  textClassName="text-white"
+                  size="sm"
+                  icon={
+                    <Camera
+                      variant="Bold"
+                      size="16"
+                      color="white"
+                      className="mr-1"
+                    />
+                  }
+                />
+              </View>
+            )}
+          </View>
+        ) : (
+          <Input
+            label={
+              generationMode === 'url'
+                ? 'Entrez votre URL'
+                : 'Entrez votre texte'
+            }
+            placeholder={
+              generationMode === 'url'
+                ? 'Ex: https://obytes.com'
+                : 'Ex: Mon texte secret'
+            }
+            value={inputText}
+            onChangeText={setInputText}
+            keyboardType={generationMode === 'url' ? 'url' : 'default'}
+          />
+        )}
+
+        <View className="mt-2 flex-row justify-between gap-3">
+          <Button
+            label="Générer"
+            onPress={generateQR}
+            disabled={
+              (generationMode !== 'image' && !inputText.trim()) ||
+              (generationMode === 'image' && !selectedImage)
+            }
+            className="flex-1 bg-[#FF8933]"
+            textClassName="text-white"
+            icon={
+              <Magicpen
+                variant="Bold"
+                size="20"
+                color="white"
+                className="mr-2"
+              />
+            }
+          />
+          <Button
+            label="Effacer"
+            onPress={clearAll}
+            variant="outline"
+            className="flex-1 border border-white/10 bg-white/5"
+            textClassName="text-white"
+            icon={
+              <CloseSquare
+                variant="Bold"
+                size="20"
+                color="#8F98AB"
+                className="mr-2"
+              />
+            }
+          />
+        </View>
       </View>
 
-      {generationMode === 'image' ? (
-        <View className="mb-6">
-          {selectedImage ? (
-            <View className="items-center mb-4">
-              <Image 
-                source={{ uri: selectedImage }} 
-                className="w-32 h-32 rounded-lg mb-2" 
-              />
-              <Button
-                label="🔄 Changer d'image"
-                onPress={pickImage}
-                variant="outline"
-                className="mb-2"
-                size="sm"
-              />
-            </View>
-          ) : (
-            <View className="flex-row justify-between">
-              <Button
-                label="Importer une image"
-                onPress={pickImage}
-                className="flex-1 mr-2 rounded-3xl"
-                size="sm"
-                icon={<Gallery variant="Bold" size="16" color="white" className="mr-1" />}
-              />
-              <Button
-                label="Prendre une photo"
-                onPress={takePhoto}
-                className="flex-1 ml-2 rounded-3xl"
-                size="sm"
-                icon={<Camera variant="Bold" size="16" color="white" className="mr-1" />}
-              />
-            </View>
-          )}
-        </View>
-      ) : (
-        <Input
-          label={generationMode === 'url' ? "🔗 Entrez votre URL" : "📝 Entrez votre texte"}
-          placeholder={generationMode === 'url' ? "Ex: https://obytes.com" : "Ex: Mon texte secret"}
-          value={inputText}
-          onChangeText={setInputText}
-          className="mb-4 bg-white h-12 rounded-xl px-4"
-          keyboardType={generationMode === 'url' ? 'url' : 'default'}
-        />
-      )}
-      
-      <View className="flex-row justify-between mb-6">
-        <Button
-          label="Générer"
-          onPress={generateQR}
-          disabled={(generationMode !== 'image' && !inputText.trim()) || (generationMode === 'image' && !selectedImage)}
-          className="flex-1 mr-2 bg-blue-500 rounded-xl"
-          textClassName="text-white"
-          icon={<Magicpen variant="Bold" size="20" color="white" className="mr-2" />}
-        />
-        <Button
-          label="Effacer"
-          onPress={clearAll}
-          variant="outline"
-          className="flex-1 ml-2 rounded-xl border-gray-200"
-          icon={<CloseSquare variant="Bold" size="20" color="#ef4444" className="mr-2" />}
-        />
-      </View>
-      
       <Modal
         ref={modalRef}
         snapPoints={['65%']}
-        title="Votre QR Code est prêt ! 🎉"
+        title="Votre QR Code est prêt"
         detached={true}
+        backgroundStyle={{ backgroundColor: '#0D1219' }}
         onDismiss={clearAll}
       >
-        <Animated.View 
+        <Animated.View
           style={{
             opacity: fadeAnim,
-            transform: [
-              { scale: scaleAnim },
-              { rotate: rotateInterpolate }
-            ],
+            transform: [{ scale: scaleAnim }, { rotate: rotateInterpolate }],
           }}
-          className="p-4 items-center"
+          className="items-center p-4"
         >
-          <View ref={qrRef} className="p-6 bg-white rounded-2xl shadow-lg mb-4">
-            <QRCode 
-              value={qrValue} 
+          <View ref={qrRef} className="mb-4 rounded-2xl bg-white p-6 shadow-lg">
+            <QRCode
+              value={qrValue}
               size={180}
               backgroundColor="white"
               color="black"
             />
           </View>
-          
-          <View className="flex-row mt-4 w-full px-4 gap-3">
+
+          <View className="mt-4 w-full flex-row gap-3 px-4">
             <Button
               label="Partager"
               onPress={shareQRCode}
               size="md"
-              className="flex-1 bg-blue-500"
-              icon={<Share variant="Bold" size="20" color="white" className="mr-2" />}
+              className="flex-1 bg-[#FF8933]"
+              textClassName="text-white"
+              icon={
+                <Share
+                  variant="Bold"
+                  size="20"
+                  color="white"
+                  className="mr-2"
+                />
+              }
             />
             <Button
               label="Enregistrer"
               onPress={saveToGallery}
+              variant="glass"
               size="md"
-              className="flex-1 bg-green-500"
-              icon={<Save2 variant="Bold" size="20" color="white" className="mr-2" />}
+              className="flex-1"
+              textClassName="text-white"
+              icon={
+                <Save2
+                  variant="Bold"
+                  size="20"
+                  color="white"
+                  className="mr-2"
+                />
+              }
             />
           </View>
         </Animated.View>
       </Modal>
-      
-      <SafeAreaView />
-    </View>
+    </SafeAreaView>
   );
 }
