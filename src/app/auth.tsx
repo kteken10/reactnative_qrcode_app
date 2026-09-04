@@ -11,6 +11,7 @@ import {
   ScrollView,
   StyleSheet,
   TextInput,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -192,15 +193,13 @@ export default function AuthScreen() {
             </Pressable>
 
             {/* CTA principal */}
-            <Pressable
+            <TouchableOpacity
               onPress={enter}
-              style={({ pressed }) => [
-                styles.btnPrimary,
-                pressed && styles.pressed,
-              ]}
+              activeOpacity={0.85}
+              style={styles.btnPrimary}
             >
               <Text style={styles.btnPrimaryText}>Se connecter</Text>
-            </Pressable>
+            </TouchableOpacity>
           </View>
 
           {/* ─── Séparateur ─── */}
@@ -212,36 +211,30 @@ export default function AuthScreen() {
 
           {/* ─── Social — cercles centrés ─── */}
           <View style={styles.socialRow}>
-            <Pressable
+            <TouchableOpacity
               onPress={enter}
-              style={({ pressed }) => [
-                styles.socialCircle,
-                pressed && styles.pressed,
-              ]}
+              activeOpacity={0.75}
+              style={styles.socialCircle}
             >
               <AppleGlyph size={24} />
-            </Pressable>
-            <Pressable
+            </TouchableOpacity>
+            <TouchableOpacity
               onPress={enter}
-              style={({ pressed }) => [
-                styles.socialCircle,
-                pressed && styles.pressed,
-              ]}
+              activeOpacity={0.75}
+              style={styles.socialCircle}
             >
               <GoogleGlyph size={22} />
-            </Pressable>
+            </TouchableOpacity>
           </View>
 
-          {/* ─── Invité — CTA secondaire ─── */}
-          <Pressable
+          {/* ─── Invité — CTA secondaire (verre) ─── */}
+          <TouchableOpacity
             onPress={enter}
-            style={({ pressed }) => [
-              styles.guestBtn,
-              pressed && styles.pressed,
-            ]}
+            activeOpacity={0.85}
+            style={styles.guestBtn}
           >
             <Text style={styles.guestBtnText}>Continuer sans compte</Text>
-          </Pressable>
+          </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
@@ -298,10 +291,12 @@ const styles = StyleSheet.create({
   },
   logo: { width: 44, height: 44, borderRadius: 12 },
   title: {
-    fontSize: 34,
+    fontSize: 32,
     fontWeight: '800',
     color: '#FFFFFF',
-    letterSpacing: -0.8,
+    letterSpacing: -0.6,
+    lineHeight: 40,
+    marginTop: 2,
   },
   subtitle: {
     marginTop: 8,
@@ -340,7 +335,7 @@ const styles = StyleSheet.create({
   forgotWrap: { alignSelf: 'flex-end', paddingVertical: 2 },
   forgotText: { fontSize: 13, color: AMBER, fontWeight: '600' },
 
-  /* CTA principal */
+  /* CTA principal (amber) */
   btnPrimary: {
     height: 52,
     borderRadius: 999,
@@ -383,24 +378,21 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: 'rgba(255,255,255,0.06)',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
+    borderColor: 'rgba(255,255,255,0.12)',
   },
 
-  /* Invité — CTA secondaire */
+  /* Invité — CTA secondaire (verre) */
   guestBtn: {
     height: 52,
     borderRadius: 999,
     backgroundColor: 'rgba(255,255,255,0.05)',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
+    borderColor: 'rgba(255,255,255,0.12)',
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 24,
   },
   guestBtnText: { fontSize: 15, fontWeight: '600', color: '#FFFFFF' },
-
-  /* États */
-  pressed: { opacity: 0.9, transform: [{ scale: 0.985 }] },
 });

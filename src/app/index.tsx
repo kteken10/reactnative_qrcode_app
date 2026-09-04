@@ -1,4 +1,4 @@
-import { Image } from 'expo-image';
+
 import { useRouter } from 'expo-router';
 import { ChartSquare, Flash, Folder2, ScanBarcode } from 'iconsax-react-native';
 import * as React from 'react';
@@ -25,13 +25,7 @@ export default function LandingScreen() {
     <ScreenShell scrollable>
       {/* ─── Hero ─── */}
       <View style={styles.hero}>
-        <View style={styles.logoRing}>
-          <Image
-            source={require('../../assets/logo.png')}
-            style={styles.logoImg}
-            contentFit="cover"
-          />
-        </View>
+       
         <Text style={styles.heroTitle}>Le studio de{'\n'}vos QR codes.</Text>
         <Text style={styles.heroSub}>
           Créez, scannez et analysez vos QR codes{'\n'}avec une précision pro.
