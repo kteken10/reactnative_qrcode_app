@@ -1,18 +1,33 @@
 import { BlurView } from 'expo-blur';
 import { Tabs } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet } from 'react-native';
-import { Home2, Edit2, Scan, ChartSquare, Setting2 } from 'iconsax-react-native';
+import {
+  ChartSquare,
+  Edit2,
+  Home2,
+  Scan,
+  Setting2,
+} from 'iconsax-react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 
+// Sur Android, BlurView ne floute pas par défaut : la barre serait transparente
+// et le contenu défilerait sous les icônes. On y met un fond presque opaque.
 function TabBarBackground() {
+  if (Platform.OS === 'android') {
+    return <View style={[StyleSheet.absoluteFill, styles.androidBar]} />;
+  }
   return (
-    <BlurView
-      intensity={80}
-      tint="dark"
-      style={StyleSheet.absoluteFill}
-    />
+    <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
   );
 }
+
+const styles = StyleSheet.create({
+  androidBar: {
+    backgroundColor: '#0B1016',
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: 'rgba(255,255,255,0.08)',
+  },
+});
 
 export default function AppTabsLayout() {
   return (
@@ -50,7 +65,11 @@ export default function AppTabsLayout() {
           options={{
             title: 'Home',
             tabBarIcon: ({ color, focused }) => (
-              <Home2 size={22} color={color} variant={focused ? 'Bold' : 'Linear'} />
+              <Home2
+                size={22}
+                color={color}
+                variant={focused ? 'Bold' : 'Linear'}
+              />
             ),
           }}
         />
@@ -59,7 +78,11 @@ export default function AppTabsLayout() {
           options={{
             title: 'Studio',
             tabBarIcon: ({ color, focused }) => (
-              <Edit2 size={22} color={color} variant={focused ? 'Bold' : 'Linear'} />
+              <Edit2
+                size={22}
+                color={color}
+                variant={focused ? 'Bold' : 'Linear'}
+              />
             ),
           }}
         />
@@ -68,20 +91,25 @@ export default function AppTabsLayout() {
           options={{
             title: 'Scanner',
             tabBarIcon: ({ color, focused }) => (
-              <Scan size={22} color={color} variant={focused ? 'Bold' : 'Linear'} />
+              <Scan
+                size={22}
+                color={color}
+                variant={focused ? 'Bold' : 'Linear'}
+              />
             ),
           }}
         />
-        <Tabs.Screen
-          name="library"
-          options={{ href: null }}
-        />
+        <Tabs.Screen name="library" options={{ href: null }} />
         <Tabs.Screen
           name="analytics"
           options={{
             title: 'Aperçu',
             tabBarIcon: ({ color, focused }) => (
-              <ChartSquare size={22} color={color} variant={focused ? 'Bold' : 'Linear'} />
+              <ChartSquare
+                size={22}
+                color={color}
+                variant={focused ? 'Bold' : 'Linear'}
+              />
             ),
           }}
         />
@@ -90,7 +118,11 @@ export default function AppTabsLayout() {
           options={{
             title: 'Réglages',
             tabBarIcon: ({ color, focused }) => (
-              <Setting2 size={22} color={color} variant={focused ? 'Bold' : 'Linear'} />
+              <Setting2
+                size={22}
+                color={color}
+                variant={focused ? 'Bold' : 'Linear'}
+              />
             ),
           }}
         />

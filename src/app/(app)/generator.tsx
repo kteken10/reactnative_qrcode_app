@@ -1,5 +1,5 @@
 import * as Haptics from 'expo-haptics';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Flash } from 'iconsax-react-native';
 import * as React from 'react';
 import {
@@ -66,8 +66,19 @@ export default function GeneratorScreen() {
 
   const [kind, setKind] = React.useState<Kind>('qr');
 
-  // QR state
-  const [typeIdx, setTypeIdx] = React.useState(0);
+  // QR state ; le type peut arriver de l'accueil (?type=wifi).
+  const { type } = useLocalSearchParams<{ type?: string }>();
+  const [typeIdx, setTypeIdx] = React.useState(() =>
+    Math.max(
+      0,
+      QR_TYPES.findIndex((t) => t.key === type)
+    )
+  );
+  // Le Studio reste monté entre deux onglets : on suit aussi les changements de type.
+  React.useEffect(() => {
+    const idx = QR_TYPES.findIndex((t) => t.key === type);
+    if (idx >= 0) setTypeIdx(idx);
+  }, [type]);
   const [fields, setFields] = React.useState<Record<string, string>>({
     security: 'WPA',
   });

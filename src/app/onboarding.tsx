@@ -1,20 +1,18 @@
 import { useRouter } from 'expo-router';
 import { ChartSquare, Flash, ScanBarcode } from 'iconsax-react-native';
 import * as React from 'react';
-import {
-  Dimensions,
-  type NativeScrollEvent,
-  type NativeSyntheticEvent,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  View,
-} from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Animated, {
+  FadeInLeft,
+  FadeInRight,
+  FadeOutLeft,
+  FadeOutRight,
+  runOnJS,
+} from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui';
-
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 const SLIDES = [
   {
@@ -55,13 +53,17 @@ const SLIDES = [
 export default function OnboardingScreen() {
   const router = useRouter();
   const [step, setStep] = React.useState(0);
-  const scrollRef = React.useRef<ScrollView>(null);
+  // Sens du dernier changement, pour faire glisser la slide du bon côté.
+  const [dir, setDir] = React.useState<1 | -1>(1);
 
   const slide = SLIDES[step];
 
-  const handleScrollEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const page = Math.round(e.nativeEvent.contentOffset.x / SCREEN_WIDTH);
-    setStep(page);
+  // Une seule slide affichée, remplacée avec une animation : plus fiable qu'un
+  // ScrollView horizontal paginé, dont scrollTo est capricieux sous la New Architecture.
+  const goTo = (next: number) => {
+    if (next < 0 || next >= SLIDES.length) return;
+    setDir(next > step ? 1 : -1);
+    setStep(next);
   };
 
   const goNext = () => {
@@ -69,10 +71,15 @@ export default function OnboardingScreen() {
       router.replace('/auth' as never);
       return;
     }
-    const next = step + 1;
-    scrollRef.current?.scrollTo({ x: next * SCREEN_WIDTH, animated: true });
-    setStep(next);
+    goTo(step + 1);
   };
+
+  const swipe = Gesture.Pan()
+    .activeOffsetX([-20, 20])
+    .onEnd((e) => {
+      if (e.translationX < -50) runOnJS(goTo)(step + 1);
+      else if (e.translationX > 50) runOnJS(goTo)(step - 1);
+    });
 
   const skip = () => router.replace('/auth' as never);
 
@@ -99,39 +106,37 @@ export default function OnboardingScreen() {
         </Pressable>
       </View>
 
-      {/* Pager */}
-      <ScrollView
-        ref={scrollRef}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onMomentumScrollEnd={handleScrollEnd}
-        scrollEventThrottle={16}
-        style={styles.pager}
-        contentContainerStyle={styles.pagerContent}
-        decelerationRate="fast"
-      >
-        {SLIDES.map((s, i) => (
-          <View key={i} style={[styles.slide, { width: SCREEN_WIDTH }]}>
+      {/* Slide active */}
+      <GestureDetector gesture={swipe}>
+        <View style={styles.pager}>
+          <Animated.View
+            key={step}
+            entering={(dir === 1 ? FadeInRight : FadeInLeft).duration(320)}
+            exiting={(dir === 1 ? FadeOutLeft : FadeOutRight).duration(200)}
+            style={styles.slide}
+          >
             {/* Outer soft glow ring */}
             <View
-              style={[styles.iconGlowOuter, { backgroundColor: s.glowOuter }]}
+              style={[
+                styles.iconGlowOuter,
+                { backgroundColor: slide.glowOuter },
+              ]}
               pointerEvents="none"
             />
             {/* Icon box */}
             <View
               style={[
                 styles.iconBox,
-                { backgroundColor: s.bg, borderColor: s.border },
+                { backgroundColor: slide.bg, borderColor: slide.border },
               ]}
             >
-              <s.Icon size={60} color={s.color} variant="Bold" />
+              <slide.Icon size={60} color={slide.color} variant="Bold" />
             </View>
-            <Text style={styles.title}>{s.title}</Text>
-            <Text style={styles.sub}>{s.sub}</Text>
-          </View>
-        ))}
-      </ScrollView>
+            <Text style={styles.title}>{slide.title}</Text>
+            <Text style={styles.sub}>{slide.sub}</Text>
+          </Animated.View>
+        </View>
+      </GestureDetector>
 
       {/* Bottom — hors du pager pour rester toujours visible */}
       <View style={styles.bottom}>
@@ -210,10 +215,9 @@ const styles = StyleSheet.create({
   },
 
   pager: { flex: 1 },
-  pagerContent: { alignItems: 'center' },
 
   slide: {
-    flex: 1,
+    ...StyleSheet.absoluteFillObject,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 36,

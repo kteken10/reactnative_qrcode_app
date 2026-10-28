@@ -83,7 +83,7 @@ export const demoQrs: DemoQr[] = [
   {
     id: 'qr-aurora',
     title: 'Aurum Launch Kit',
-    subtitle: 'URL landing page',
+    subtitle: 'Page de lancement',
     type: 'URL',
     content: 'https://aurum.design/launch',
     folder: 'Branding',
@@ -95,7 +95,7 @@ export const demoQrs: DemoQr[] = [
   {
     id: 'qr-atelier',
     title: 'Atelier RSVP',
-    subtitle: 'Event registration',
+    subtitle: 'Inscription à un événement',
     type: 'Event',
     content: 'Atelier premium - 17 juillet - Paris',
     folder: 'Events',
@@ -107,7 +107,7 @@ export const demoQrs: DemoQr[] = [
   {
     id: 'qr-vcard',
     title: 'Founder vCard',
-    subtitle: 'Contact share',
+    subtitle: 'Carte de contact',
     type: 'Contact',
     content: 'Mickael Delormes · hello@aurum.studio',
     folder: 'Private',
@@ -119,7 +119,7 @@ export const demoQrs: DemoQr[] = [
   {
     id: 'qr-wifi',
     title: 'Showroom Wi-Fi',
-    subtitle: 'Network access',
+    subtitle: 'Accès au réseau',
     type: 'Wi-Fi',
     content: 'Aurum_Showroom / premium2026',
     folder: 'Events',

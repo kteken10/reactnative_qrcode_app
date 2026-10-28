@@ -16,6 +16,7 @@ import Animated, {
 import { ScreenShell } from '@/components/premium';
 import { Text } from '@/components/ui';
 import { demoActivity, demoCollections, demoStats } from '@/data/demo';
+import { QR_TYPES } from '@/data/studio';
 import { useDemoState } from '@/lib/demo-state';
 
 const AMBER = '#FF8933'; // action / marque
@@ -164,11 +165,11 @@ export default function DashboardScreen() {
             Dashboard
           </Text>
           <Text style={styles.greeting}>
-            Bonsoir, <Text style={styles.greetingAccent}>Mika.</Text>
+            {greeting()}, <Text style={styles.greetingAccent}>bienvenue.</Text>
           </Text>
         </View>
         <View style={styles.uptimeBadge}>
-          <Text style={styles.uptimeText}>↑ 98% uptime</Text>
+          <Text style={styles.uptimeText}>Mode démo</Text>
         </View>
       </View>
 
@@ -226,8 +227,8 @@ export default function DashboardScreen() {
                 <Text style={styles.activityDetail} numberOfLines={1}>
                   {item.detail}
                 </Text>
+                <Text style={styles.activityTime}>{item.time}</Text>
               </View>
-              <Text style={styles.activityTime}>{item.time}</Text>
             </View>
           ))}
         </CarouselItem>
@@ -256,7 +257,7 @@ export default function DashboardScreen() {
                   <Folder2 size={18} color={AMBER} variant="Bold" />
                 </View>
                 <Text style={styles.folderName} numberOfLines={1}>
-                  {col.name}
+                  {FOLDER_LABELS[col.name] ?? col.name}
                 </Text>
                 <Text style={styles.folderCount}>{col.count}</Text>
               </Pressable>
@@ -297,11 +298,70 @@ export default function DashboardScreen() {
           <Text className="text-sm font-bold text-[#8F98AB]">Scanner</Text>
         </Pressable>
       </View>
+
+      {/* ─── Création rapide par type ─── */}
+      <Text style={[styles.cardLabel, styles.quickLabel]}>Création rapide</Text>
+      <View style={styles.quickGrid}>
+        {QR_TYPES.slice(0, 4).map((t) => (
+          <Pressable
+            key={t.key}
+            onPress={async () => {
+              await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              router.push({
+                pathname: '/(app)/generator',
+                params: { type: t.key },
+              });
+            }}
+            style={styles.quickTile}
+            className="active:opacity-75"
+          >
+            <View style={styles.quickIcon}>
+              <t.Icon size={20} color={AMBER} variant="Bold" />
+            </View>
+            <Text style={styles.quickTileText}>{t.label}</Text>
+          </Pressable>
+        ))}
+      </View>
     </ScreenShell>
   );
 }
 
+// Mêmes libellés que les filtres de la bibliothèque.
+const FOLDER_LABELS: Record<string, string> = {
+  Events: 'Événements',
+  Products: 'Produits',
+  Private: 'Privé',
+};
+
+function greeting() {
+  const h = new Date().getHours();
+  return h >= 5 && h < 18 ? 'Bonjour' : 'Bonsoir';
+}
+
 const styles = StyleSheet.create({
+  /* Création rapide */
+  quickLabel: { marginTop: 28, marginBottom: 12 },
+  quickGrid: { flexDirection: 'row', gap: 10 },
+  quickTile: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 16,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+  },
+  quickIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,137,51,0.12)',
+  },
+  quickTileText: { fontSize: 13, fontWeight: '600', color: '#E6EAF2' },
+
   /* En-tête */
   greeting: {
     fontSize: 22,
@@ -433,7 +493,7 @@ const styles = StyleSheet.create({
   activityRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 14,
+    paddingVertical: 10,
   },
   activityDivider: {
     borderBottomWidth: 1,
@@ -452,9 +512,8 @@ const styles = StyleSheet.create({
   activityDetail: { fontSize: 12, color: '#8F98AB' },
   activityTime: {
     fontSize: 11,
-    color: '#4D5A6B',
+    color: '#5F6B7D',
     fontWeight: '500',
-    flexShrink: 0,
   },
 
   /* Dots */
